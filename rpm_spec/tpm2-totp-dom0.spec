@@ -1,0 +1,104 @@
+%define base_name tpm2-totp
+
+Name:           tpm2-totp
+Version:		@VERSION@
+Release:		@REL@{?dist}
+Epoch:          1000
+Summary:        TPM2 based TOTP secret generation
+License:        BSD
+URL:            https://github.com/tpm2-software/tpm2-totp
+Source0:        %{base_name}-%{version}.tar.gz
+
+BuildRequires:  gcc
+BuildRequires:  autoconf
+BuildRequires:  autoconf-archive
+BuildRequires:  automake
+BuildRequires:  libtool
+BuildRequires:  tpm2-tss >= 2.3
+BuildRequires:  qrencode-libs
+BuildRequires:  qrencode-devel
+BuildRequires:  plymouth-devel
+BuildRequires:  tss2-devel
+BuildRequires:  tpm2-tools
+BuildRequires:  tpm2-tss
+BuildRequires:  tpm2-tss-devel
+BuildRequires:  pkgconfig
+
+# Man Pages
+BuildRequires:	pandoc
+BuildRequires:	doxygen
+
+Requires: 		tpm2-tss >= 2.3
+Requires:  		qrencode-libs
+
+
+%description
+This is a reimplementation of Matthew Garrett's tpmtotp software for TPM 2.0 using the tpm2-tss software stack. Its purpose is to attest the trustworthiness of a device against a human using time-based one-time passwords (TOTP), facilitating the Trusted Platform Module (TPM) to bind the TOTP secret to the known trustworthy system state. In addition to the original tpmtotp, given the new capabilities of in-TPM HMAC calculation, the tpm2-totp's secret HMAC keys do not have to be exported from the TPM to the CPU's RAM on boot anymore. Another addition is the ability to rebind an old secret to the current PCRs in case a software component was changed on purpose, using a user-defined password.
+
+%package        doc
+Summary:        Documentation for %{name}
+BuildArch:      noarch
+Requires:       %{name} = %{epoch}:%{version}-%{release}
+
+
+%package        devel
+Summary:        Devel information for %{name}
+BuildArch:      noarch
+Requires:       %{name} = %{epoch}:%{version}-%{release}
+
+%description    doc
+Pandoc generated documentation for %{name}.
+
+
+%description    devel
+Development headers generated documentation for %{name}.
+
+%prep
+%autosetup -p1 -n %{base_name}-%{version}
+
+%build
+mkdir build && pushd build
+ln -s ../configure configure
+%configure
+%make_build
+popd
+
+#doxygen pseudo-doc.doxygen
+#mv pseudo-doc/html pseudo-doc/doxygen
+
+%install
+pushd build
+%make_install
+
+#mkdir -p %{buildroot}%{_mandir}/man1/
+#install -Dpm0644 man/*.1 \
+#        %{buildroot}%{_mandir}/man1/
+
+mkdir -p %{buildroot}%{_datadir}/pixmaps/
+install -Dpm0644 %{SOURCE0} \
+        %{buildroot}%{_datadir}/pixmaps/
+
+
+%files
+%{_bindir}/%{base_name}*
+/usr/lib/dracut/modules.d/70tpm2-totp/*
+/usr/libexec/tpm2-totp/*
+/usr/lib64/libtpm2-totp.a
+/usr/lib64/libtpm2-totp.la
+/usr/lib64/libtpm2-totp.so
+/usr/lib64/libtpm2-totp.so.0
+/usr/lib64/libtpm2-totp.so.0.0.0
+/usr/lib64/pkgconfig/tpm2-totp.pc
+/usr/lib/debug/usr/lib64/libtpm2-totp.so.0.0.0-%{version}-fc32.x86_64.debug
+
+%files doc
+#%license /usr/share/licenses/tpm2-totp/LICENSE
+/usr/share/man/man1/tpm2-totp.1.gz
+/usr/share/man/man3/tpm2-totp.3.gz
+/usr/share/pixmaps/tpm2-totp-%{version}.tar.gz
+
+%files devel
+/usr/include/tpm2-totp.h
+
+%changelog
+#@CHANGELOG@
