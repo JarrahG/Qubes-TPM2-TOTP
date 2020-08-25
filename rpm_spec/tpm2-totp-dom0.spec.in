@@ -63,16 +63,9 @@ ln -s ../configure configure
 %make_build
 popd
 
-#doxygen pseudo-doc.doxygen
-#mv pseudo-doc/html pseudo-doc/doxygen
-
 %install
 pushd build
 %make_install
-
-#mkdir -p %{buildroot}%{_mandir}/man1/
-#install -Dpm0644 man/*.1 \
-#        %{buildroot}%{_mandir}/man1/
 
 mkdir -p %{buildroot}%{_datadir}/pixmaps/
 install -Dpm0644 %{SOURCE0} \
@@ -92,7 +85,6 @@ install -Dpm0644 %{SOURCE0} \
 /usr/lib/debug/usr/lib64/libtpm2-totp.so.0.0.0-%{version}-fc32.x86_64.debug
 
 %files doc
-#%license /usr/share/licenses/tpm2-totp/LICENSE
 /usr/share/man/man1/tpm2-totp.1.gz
 /usr/share/man/man3/tpm2-totp.3.gz
 /usr/share/pixmaps/tpm2-totp-%{version}.tar.gz
@@ -101,4 +93,4 @@ install -Dpm0644 %{SOURCE0} \
 /usr/include/tpm2-totp.h
 
 %changelog
-#@CHANGELOG@
+@CHANGELOG@

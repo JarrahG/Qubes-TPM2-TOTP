@@ -15,6 +15,10 @@ SHELL := /bin/bash
 
 %: %.sha512
 	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF) $(DISTFILES_MIRROR)$@
+	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF).asc $(DISTFILES_MIRROR)$@.asc
+	gpg2 --import keys/AndreasFuchsSIT.gpg keys/diabonas.gpg
+	@gpg2 --verify $@$(UNTRUSTED_SUFF).asc || \
+			{ echo "Wrong SHA512 checksum on $@$(UNTRUSTED_SUFF)!"; exit 1; }
 	@sha512sum --status -c <(printf "$$(cat $<)  -\n") <$@$(UNTRUSTED_SUFF) || \
 			{ echo "Wrong SHA512 checksum on $@$(UNTRUSTED_SUFF)!"; exit 1; }
 	@mv $@$(UNTRUSTED_SUFF) $@
@@ -24,5 +28,5 @@ get-sources: $(SRC_FILE)
 
 .PHONY: verify-sources
 verify-sources:
-	# TODO: Actually verify sources
 	@true
+
