@@ -13,20 +13,19 @@ FETCH_CMD := wget --no-use-server-timestamps -q -O
 
 SHELL := /bin/bash
 
-%: %.sha512
-	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF) $(DISTFILES_MIRROR)$@
-	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF).asc $(DISTFILES_MIRROR)$@.asc
-	gpg2 --import keys/AndreasFuchsSIT.gpg keys/diabonas.gpg
-	@gpg2 --verify $@$(UNTRUSTED_SUFF).asc || \
-			{ echo "Wrong SHA512 checksum on $@$(UNTRUSTED_SUFF)!"; exit 1; }
-	@sha512sum --status -c <(printf "$$(cat $<)  -\n") <$@$(UNTRUSTED_SUFF) || \
-			{ echo "Wrong SHA512 checksum on $@$(UNTRUSTED_SUFF)!"; exit 1; }
-	@mv $@$(UNTRUSTED_SUFF) $@
-
 .PHONY: get-sources
 get-sources: $(SRC_FILE)
 
+.PHONY: import-keys
+import-keys:
+	@if [ -n "$$GNUPGHOME" ]; then rm -f "$$GNUPGHOME/tpm2-totp-trustedkeys.gpg"; fi
+	@gpg --no-auto-check-trustdb --no-default-keyring --keyring tpm2-totp-trustedkeys.gpg -q --import keys/*.gpg
+
 .PHONY: verify-sources
-verify-sources:
-	@true
+verify-sources: import-keys
+	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF) $(DISTFILES_MIRROR)$@
+	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF).asc $(DISTFILES_MIRROR)$@.asc
+	@gpg2 --keyring tpm2-totp-trustedkeys.gpg --verify $@$(UNTRUSTED_SUFF).asc || \
+			{ echo "Bad GPG signature on on $@$(UNTRUSTED_SUFF)!"; exit 1; }
+	@mv $@$(UNTRUSTED_SUFF) $@
 
