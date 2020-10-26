@@ -2,7 +2,7 @@
 
 Name:           tpm2-totp
 Version:		@VERSION@
-Release:		@REL@{?dist}
+Release:		@REL@%{?dist}
 Epoch:          1000
 Summary:        TPM2 based TOTP secret generation
 License:        BSD
