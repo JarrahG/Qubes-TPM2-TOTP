@@ -2,7 +2,7 @@
 
 Name:           tpm2-totp
 Version:		@VERSION@
-Release:		@REL@{?dist}
+Release:		@REL@%{?dist}
 Epoch:          1000
 Summary:        TPM2 based TOTP secret generation
 License:        BSD
@@ -82,7 +82,6 @@ install -Dpm0644 %{SOURCE0} \
 /usr/lib64/libtpm2-totp.so.0
 /usr/lib64/libtpm2-totp.so.0.0.0
 /usr/lib64/pkgconfig/tpm2-totp.pc
-/usr/lib/debug/usr/lib64/libtpm2-totp.so.0.0.0-%{version}-fc32.x86_64.debug
 
 %files doc
 /usr/share/man/man1/tpm2-totp.1.gz
