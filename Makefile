@@ -19,13 +19,13 @@ get-sources: $(SRC_FILE)
 .PHONY: import-keys
 import-keys:
 	@if [ -n "$$GNUPGHOME" ]; then rm -f "$$GNUPGHOME/tpm2-totp-trustedkeys.gpg"; fi
-	@gpg --no-auto-check-trustdb --no-default-keyring --keyring tpm2-totp-trustedkeys.gpg -q --import keys/*.gpg
+	@gpg --no-auto-check-trustdb --no-default-keyring --keyring "$$GNUPGHOME"/tpm2-totp-trustedkeys.gpg -q --import keys/*.gpg
 
 .PHONY: verify-sources
 verify-sources: import-keys
 	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF) $(DISTFILES_MIRROR)$@
 	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF).asc $(DISTFILES_MIRROR)$@.asc
-	@gpg2 --keyring tpm2-totp-trustedkeys.gpg --verify $@$(UNTRUSTED_SUFF).asc || \
+	@gpg2 --keyring "$$GNUPGHOME/tpm2-totp-trustedkeys.gpg --verify $@$(UNTRUSTED_SUFF).asc || \
 			{ echo "Bad GPG signature on on $@$(UNTRUSTED_SUFF)!"; exit 1; }
 	@mv $@$(UNTRUSTED_SUFF) $@
 
